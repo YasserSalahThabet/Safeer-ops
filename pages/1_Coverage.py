@@ -29,5 +29,8 @@ st.session_state.coverage_df = edited
 
 st.markdown("---")
 
-if st.button("Deploy Scheduler"):
-    st.success("Scheduler integration will be connected next.")
+from utils.sheets import write_sheet
+
+if st.button("Save Coverage to Google Sheets"):
+    write_sheet("Safeer", "Client_Shifts_Weekly", st.session_state.coverage_df)
+    st.success("Coverage saved to Google Sheets.")
