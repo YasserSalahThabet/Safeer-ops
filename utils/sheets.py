@@ -1,5 +1,6 @@
 import pandas as pd
 import gspread
+import streamlit as st
 from google.oauth2.service_account import Credentials
 
 SCOPES = [
@@ -7,14 +8,15 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-def get_client(service_account_info: dict):
+def get_client():
     credentials = Credentials.from_service_account_info(
-        service_account_info,
+        st.secrets["gcp_service_account"],
         scopes=SCOPES
     )
     return gspread.authorize(credentials)
 
-def read_sheet(gc, spreadsheet_name: str, worksheet_name: str):
+def read_sheet(spreadsheet_name: str, worksheet_name: str):
+    gc = get_client()
     try:
         sh = gc.open(spreadsheet_name)
         ws = sh.worksheet(worksheet_name)
@@ -23,7 +25,8 @@ def read_sheet(gc, spreadsheet_name: str, worksheet_name: str):
     except Exception:
         return pd.DataFrame()
 
-def write_sheet(gc, spreadsheet_name: str, worksheet_name: str, df: pd.DataFrame):
+def write_sheet(spreadsheet_name: str, worksheet_name: str, df: pd.DataFrame):
+    gc = get_client()
     sh = gc.open(spreadsheet_name)
 
     try:
