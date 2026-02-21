@@ -1,43 +1,67 @@
 import streamlit as st
-import pandas as pd
+from pathlib import Path
+import datetime
 
-st.title("Schedule & Attendance")
+st.set_page_config(page_title="Attendance | Safeer Ops", layout="wide")
 
-st.markdown("### Today's Operations")
+def img_exists(p):
+    return Path(p).exists()
 
-st.info("Scheduled drivers will appear here after scheduler integration.")
+# --- HERO BANNER ---
+if img_exists("assets/attendance.png"):
+    st.image("assets/attendance.png", use_container_width=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# --- PAGE HEADER ---
+st.markdown(
+    """
+    <h1 style='margin-bottom:0;'>Shift Attendance</h1>
+    <p style='color:#9CA3AF; margin-top:5px;'>
+        Supervisor role management • Daily tracking • 90-day retention
+    </p>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown("---")
 
-st.markdown("### Attendance Marking")
+# --- DATE + SHIFT SELECTOR ---
+col1, col2 = st.columns([2,2])
 
-attendance_columns = [
-    "slot_id",
-    "driver_id",
-    "status",
-    "check_in",
-    "check_out",
-    "notes"
-]
+with col1:
+    selected_date = st.date_input(
+        "Select Date",
+        value=datetime.date.today(),
+        format="DD/MM/YYYY"
+    )
 
-if "attendance_df" not in st.session_state:
-    st.session_state.attendance_df = pd.DataFrame(columns=attendance_columns)
+with col2:
+    shift = st.selectbox(
+        "Select Shift",
+        ["Morning", "Afternoon", "Night"]
+    )
 
-edited_attendance = st.data_editor(
-    st.session_state.attendance_df,
-    num_rows="dynamic",
+st.markdown("### Drivers on Shift")
+
+# Placeholder table (we’ll connect logic next)
+st.dataframe(
+    {
+        "Driver ID": [],
+        "Driver Name": [],
+        "Status": []
+    },
     use_container_width=True
 )
 
-st.session_state.attendance_df = edited_attendance
-
 st.markdown("---")
 
-if st.button("Export Attendance (CSV)"):
-    csv = st.session_state.attendance_df.to_csv(index=False)
-    st.download_button(
-        "Download File",
-        csv,
-        file_name="attendance_export.csv",
-        mime="text/csv"
-    )
+# Small subtle footer (not loud)
+st.markdown(
+    """
+    <p style='font-size:12px; color:#6B7280;'>
+    Safeer Operations • Attendance Module
+    </p>
+    """,
+    unsafe_allow_html=True
+)
